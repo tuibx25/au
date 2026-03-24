@@ -512,10 +512,10 @@
                 if (!badgeSpan) {
                     badgeSpan = document.createElement('span');
                     badgeSpan.className = 'now-playing-badge';
-                    badgeSpan.innerText = '🔊 Đang phát';
+                    badgeSpan.innerText = '🔊 ';
                     item.appendChild(badgeSpan);
                 } else {
-                    badgeSpan.innerText = '🔊 Đang phát';
+                    badgeSpan.innerText = '🔊 ';
                     badgeSpan.style.display = 'inline-block';
                 }
             } else {
@@ -574,7 +574,7 @@
                     let modeText = "";
                     if (repeatMode === 1) modeText = " 🔂 (lặp bài)";
                     else if (repeatMode === 2) modeText = " 🔁 (lặp danh sách)";
-                    updateStatusMessage(`Đang phát: ${getDisplayName(trackSrc)}${modeText}`);
+                    updateStatusMessage(`: ${getDisplayName(trackSrc)}${modeText}`);
                 }).catch(err => {
                     console.warn("Auto play bị chặn:", err);
                     isPlaying = false;
@@ -584,7 +584,7 @@
             } else {
                 isPlaying = true;
                 updateTrackInfoUI();
-                updateStatusMessage(`Đang phát: ${getDisplayName(trackSrc)}`);
+                updateStatusMessage(`: ${getDisplayName(trackSrc)}`);
             }
         } else {
             isPlaying = false;
@@ -639,7 +639,7 @@
                     let modeHint = "";
                     if (repeatMode === 1) modeHint = " 🔂 lặp 1 bài";
                     else if (repeatMode === 2) modeHint = " 🔁 lặp tất cả";
-                    statusMsgDiv.innerText = `🎵 Đang phát Tam Quốc${modeHint}`;
+                    statusMsgDiv.innerText = `🎵  Tam Quốc${modeHint}`;
                 }
             }
         }, 2800);
@@ -665,7 +665,7 @@
                     let modeText = "";
                     if (repeatMode === 1) modeText = " 🔂 (lặp bài)";
                     else if (repeatMode === 2) modeText = " 🔁 (lặp danh sách)";
-                    updateStatusMessage(`Đang phát: ${getDisplayName(trackFiles[currentTrackIndex])}${modeText}`);
+                    updateStatusMessage(`: ${getDisplayName(trackFiles[currentTrackIndex])}${modeText}`);
                 }).catch(err => {
                     console.warn("Play bị chặn:", err);
                     updateStatusMessage(`⚠️ Không thể phát: ${err.message}. Kiểm tra file.`);
@@ -786,7 +786,7 @@
             if (idx === currentTrackIndex && isPlaying) {
                 const badge = document.createElement('span');
                 badge.className = 'now-playing-badge';
-                badge.innerText = '🔊 Đang phát';
+                badge.innerText = '🔊 ';
                 itemDiv.appendChild(badge);
             }
             
