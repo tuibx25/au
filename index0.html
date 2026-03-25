@@ -1,0 +1,827 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Tam Quốc Diễn Nghĩa - Audio Player)</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none; /* slightly cleaner for buttons, but text can still be selected if needed */
+        }
+
+        body {
+            background: linear-gradient(145deg, #1a2a2f 0%, #0e1a1f 100%);
+            font-family: 'Segoe UI', 'Roboto', 'Noto Sans', system-ui, -apple-system, 'Helvetica Neue', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        /* main card */
+        .music-container {
+            max-width: 700px;
+            width: 100%;
+            background: rgba(22, 34, 38, 0.85);
+            backdrop-filter: blur(2px);
+            border-radius: 48px;
+            box-shadow: 0 25px 45px rgba(0, 0, 0, 0.5), inset 0 1px 1px rgba(255, 255, 255, 0.08);
+            overflow: hidden;
+            border: 1px solid rgba(210, 180, 140, 0.3);
+            transition: all 0.2s;
+        }
+
+        /* header */
+        .header {
+            background: #2c1e12c9;
+            padding: 20px 24px;
+            text-align: center;
+            border-bottom: 1px solid #d4af6e40;
+        }
+
+        .header h1 {
+            font-size: 1.9rem;
+            letter-spacing: 2px;
+            color: #f7e5c2;
+            text-shadow: 2px 2px 0 #3a2a1c;
+            font-weight: 600;
+            word-break: keep-all;
+        }
+
+        .header p {
+            color: #c0b28a;
+            font-size: 0.85rem;
+            margin-top: 6px;
+            font-style: italic;
+        }
+
+        /* player area */
+        .player-panel {
+            padding: 24px 24px 20px;
+            background: #0f191eb3;
+        }
+
+        .track-info {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .track-title {
+            background: #1f2c24;
+            display: inline-block;
+            padding: 8px 24px;
+            border-radius: 60px;
+            font-size: 1.2rem;
+            font-weight: 500;
+            color: #ffecb3;
+            box-shadow: inset 0 1px 3px #00000033, 0 2px 3px rgba(0,0,0,0.2);
+            backdrop-filter: blur(4px);
+            max-width: 100%;
+            white-space: nowrap;
+            overflow-x: auto;
+            scrollbar-width: thin;
+        }
+
+        .track-title span {
+            display: inline-block;
+        }
+
+        /* control buttons */
+        .controls {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 28px;
+            margin: 25px 0 20px;
+            flex-wrap: wrap;
+        }
+
+        .ctrl-btn {
+            background: #2f3e3c;
+            border: none;
+            width: 58px;
+            height: 58px;
+            border-radius: 60px;
+            font-size: 1.9rem;
+            cursor: pointer;
+            color: #f3deba;
+            transition: 0.2s;
+            box-shadow: 0 5px 0 #121a1c;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(2px);
+        }
+
+        .ctrl-btn:active {
+            transform: translateY(2px);
+            box-shadow: 0 2px 0 #121a1c;
+        }
+
+        .ctrl-btn.play-btn {
+            background: #b97f44;
+            color: white;
+            width: 70px;
+            height: 70px;
+            font-size: 2.3rem;
+            box-shadow: 0 6px 0 #6a3e1c;
+        }
+
+        .ctrl-btn.play-btn:active {
+            transform: translateY(3px);
+        }
+        
+        /* Repeat button styling */
+        .ctrl-btn.repeat-btn {
+            background: #2f4b3c;
+            width: 58px;
+            height: 58px;
+            font-size: 1.5rem;
+            font-weight: bold;
+            box-shadow: 0 5px 0 #1a2c22;
+            position: relative;
+        }
+        
+        .ctrl-btn.repeat-btn.active-repeat-one {
+            background: #c28a4b;
+            color: white;
+            box-shadow: 0 5px 0 #7a4a1e;
+            border: 1px solid #ffd966;
+        }
+        
+        .ctrl-btn.repeat-btn.active-repeat-all {
+            background: #6a9c78;
+            color: white;
+            box-shadow: 0 5px 0 #3a6040;
+            border: 1px solid #c0e0b0;
+        }
+        
+        .repeat-badge-text {
+            font-size: 0.7rem;
+            margin-left: 4px;
+        }
+
+        /* progress bar */
+        .progress-area {
+            margin: 15px 0 12px;
+        }
+
+        .time-slider {
+            width: 100%;
+            height: 5px;
+            -webkit-appearance: none;
+            background: #4a5b56;
+            border-radius: 10px;
+            outline: none;
+            cursor: pointer;
+        }
+
+        .time-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 16px;
+            height: 16px;
+            background: #e7b874;
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 1px 3px black;
+            border: none;
+        }
+
+        .time-display {
+            display: flex;
+            justify-content: space-between;
+            color: #cbc29e;
+            font-size: 0.75rem;
+            margin-top: 8px;
+            font-family: monospace;
+        }
+
+        /* playlist */
+        .playlist-section {
+            background: #0c1417d9;
+            border-top: 1px solid #c2a15540;
+            padding: 10px 0 18px 0;
+        }
+
+        .playlist-header {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 24px 8px;
+            color: #ddce9f;
+            font-weight: 500;
+            border-bottom: 1px dashed #5f6b5a;
+            font-size: 0.9rem;
+        }
+        
+        .repeat-status-header {
+            font-size: 0.75rem;
+            background: #2a3a2e;
+            padding: 2px 8px;
+            border-radius: 30px;
+            color: #e7dbaa;
+        }
+
+        .playlist-scroll {
+            max-height: 360px;
+            overflow-y: auto;
+            padding: 6px 12px 6px 18px;
+            scrollbar-width: thin;
+        }
+
+        .playlist-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 16px;
+            margin: 6px 0;
+            background: #1d2a27a0;
+            border-radius: 60px;
+            cursor: pointer;
+            transition: 0.15s;
+            border: 1px solid transparent;
+            backdrop-filter: blur(2px);
+        }
+
+        .playlist-item:hover {
+            background: #2d413caa;
+            border-color: #c6a75d70;
+            transform: scale(0.99);
+        }
+
+        .playlist-item.active-track {
+            background: #a5672fcc;
+            border-left: 6px solid #f5bc70;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        }
+
+        .track-number {
+            font-weight: 600;
+            background: #00000055;
+            width: 32px;
+            height: 32px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 40px;
+            margin-right: 12px;
+            color: #f0dba4;
+        }
+
+        .track-name {
+            flex: 1;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: #f2e5cd;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            padding-right: 8px;
+        }
+
+        .now-playing-badge {
+            font-size: 0.7rem;
+            background: #ecb176;
+            padding: 4px 10px;
+            border-radius: 40px;
+            color: #1e2b22;
+            font-weight: bold;
+        }
+
+        /* small status */
+        .status-msg {
+            text-align: center;
+            font-size: 0.7rem;
+            color: #ad9f78;
+            padding: 8px;
+            border-top: 1px solid #2d3d30;
+        }
+
+        @media (max-width: 550px) {
+            .controls {
+                gap: 15px;
+            }
+            .ctrl-btn {
+                width: 48px;
+                height: 48px;
+                font-size: 1.5rem;
+            }
+            .ctrl-btn.play-btn {
+                width: 60px;
+                height: 60px;
+                font-size: 2rem;
+            }
+            .ctrl-btn.repeat-btn {
+                width: 48px;
+                height: 48px;
+                font-size: 1.2rem;
+            }
+            .track-title {
+                font-size: 0.9rem;
+                white-space: normal;
+                word-break: break-word;
+            }
+            .playlist-item {
+                padding: 8px 12px;
+            }
+            .track-name {
+                font-size: 0.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="music-container">
+    <div class="header">
+        <h1>🎧 Tam Quốc Diễn Nghĩa</h1>
+        <p>Đọc truyện 120 hồi</p>
+    </div>
+
+    <div class="player-panel">
+        <div class="track-info">
+            <div class="track-title" id="currentTrackLabel">
+                <span>Chưa chọn bài</span>
+            </div>
+        </div>
+
+        <div class="controls">
+            <button class="ctrl-btn" id="prevBtn" title="Bài trước">⏮</button>
+            <button class="ctrl-btn play-btn" id="playPauseBtn" title="Phát / Dừng">▶</button>
+            <button class="ctrl-btn" id="nextBtn" title="Bài tiếp">⏭</button>
+            <button class="ctrl-btn repeat-btn" id="repeatBtn" title="Chế độ lặp: Tắt / Lặp một bài / Lặp tất cả">🔁</button>
+        </div>
+
+        <div class="progress-area">
+            <input type="range" id="progressSlider" class="time-slider" value="0" step="1">
+            <div class="time-display">
+                <span id="currentTime">0:00</span>
+                <span id="durationTime">0:00</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="playlist-section">
+        <div class="playlist-header">
+            <span>📖 Danh sách chương hồi (Tam Quốc)</span>
+            <span id="repeatModeHeader" class="repeat-status-header">🔁 Lặp: Tắt</span>
+        </div>
+        <div class="playlist-scroll" id="playlistContainer">
+            <!-- dynamic playlist via js -->
+        </div>
+    </div>
+    <div class="status-msg" id="statusMsg">
+        ✅ Sẵn sàng • Nhấn vào bài để nghe
+    </div>
+</div>
+
+<script>
+    // --------------------------------------------------------------
+    // 1. Danh sách file âm thanh (001 -> 120 end)
+    // --------------------------------------------------------------
+    const generateFileList = () => {
+        const files = [];
+        for (let i = 1; i <= 119; i++) {
+            const numberStr = i.toString().padStart(3, '0');
+            files.push(`Tam Quoc ${numberStr}.m4a`);
+        }
+        files.push(`Tam Quoc 120 end.m4a`);
+        return files;
+    };
+
+    const trackFiles = generateFileList();  // 120 bài
+    const totalTracks = trackFiles.length;
+
+    const getDisplayName = (fileName) => {
+        return fileName.replace(/\.m4a$/i, '');
+    };
+
+    // Repeat Mode: 0 = No repeat, 1 = Repeat One (single track), 2 = Repeat All (list loop)
+    let repeatMode = 0;   // 0: off, 1: repeat one, 2: repeat all
+    
+    // State
+    let currentTrackIndex = 0;
+    let audio = new Audio();
+    let isPlaying = false;
+    let isSeeking = false;
+
+    // DOM elements
+    const playPauseBtn = document.getElementById('playPauseBtn');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const repeatBtn = document.getElementById('repeatBtn');
+    const progressSlider = document.getElementById('progressSlider');
+    const currentTimeSpan = document.getElementById('currentTime');
+    const durationTimeSpan = document.getElementById('durationTime');
+    const currentTrackLabel = document.getElementById('currentTrackLabel').querySelector('span');
+    const playlistContainer = document.getElementById('playlistContainer');
+    const statusMsgDiv = document.getElementById('statusMsg');
+    const repeatModeHeaderSpan = document.getElementById('repeatModeHeader');
+
+    // Helper format time
+    const formatTime = (seconds) => {
+        if (isNaN(seconds)) return "0:00";
+        const mins = Math.floor(seconds / 60);
+        const secs = Math.floor(seconds % 60);
+        return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+    };
+    
+    // Cập nhật giao diện nút repeat + header
+    const updateRepeatUI = () => {
+        if (repeatMode === 0) {
+            repeatBtn.style.background = "#2f4b3c";
+            repeatBtn.innerHTML = "🔁";
+            repeatBtn.title = "Chế độ lặp: Tắt (Nhấn để chọn lặp một bài)";
+            repeatModeHeaderSpan.innerHTML = "🔁 Lặp: Tắt";
+            repeatBtn.classList.remove('active-repeat-one', 'active-repeat-all');
+        } else if (repeatMode === 1) {
+            repeatBtn.style.background = "#c28a4b";
+            repeatBtn.innerHTML = "🔂";
+            repeatBtn.title = "Chế độ lặp: Lặp một bài (Nhấn để chuyển lặp tất cả)";
+            repeatModeHeaderSpan.innerHTML = "🔂 Lặp: Một bài";
+            repeatBtn.classList.add('active-repeat-one');
+            repeatBtn.classList.remove('active-repeat-all');
+        } else if (repeatMode === 2) {
+            repeatBtn.style.background = "#6a9c78";
+            repeatBtn.innerHTML = "🔁♾️";
+            repeatBtn.title = "Chế độ lặp: Lặp tất cả (Nhấn để tắt lặp)";
+            repeatModeHeaderSpan.innerHTML = "🔁 Lặp: Tất cả";
+            repeatBtn.classList.add('active-repeat-all');
+            repeatBtn.classList.remove('active-repeat-one');
+        }
+    };
+    
+    // Xử lý sự kiện kết thúc bài (ended) dựa trên chế độ lặp
+    const onTrackEnd = () => {
+        if (repeatMode === 1) {
+            // Lặp lại chính bài hiện tại
+            if (audio) {
+                audio.currentTime = 0;
+                const playPromise = audio.play();
+                if (playPromise !== undefined) {
+                    playPromise.catch(err => {
+                        console.warn("Repeat one auto play error:", err);
+                        isPlaying = false;
+                        updateTrackInfoUI();
+                        updateStatusMessage("⚠️ Không thể tự động phát lại, hãy nhấn play.");
+                    });
+                }
+                // Vẫn giữ isPlaying true, cập nhật UI
+                isPlaying = true;
+                updateTrackInfoUI();
+                updateStatusMessage(`🔂 Lặp lại: ${getDisplayName(trackFiles[currentTrackIndex])}`);
+            }
+        } 
+        else if (repeatMode === 2) {
+            // Lặp tất cả: chuyển sang bài tiếp theo, nếu hết thì về đầu
+            let nextIndex = currentTrackIndex + 1;
+            if (nextIndex >= totalTracks) {
+                nextIndex = 0;
+            }
+            currentTrackIndex = nextIndex;
+            loadTrack(currentTrackIndex, true);  // autoPlay = true
+        }
+        else {
+            // repeatMode === 0: không lặp, chuyển bài tiếp nếu còn, nếu hết thì dừng
+            if (currentTrackIndex + 1 < totalTracks) {
+                nextTrack(true);
+            } else {
+                // Hết playlist
+                isPlaying = false;
+                updateTrackInfoUI();
+                updateStatusMessage("🎉 Đã phát toàn bộ 120 chương. Bật chế độ lặp để nghe tiếp!");
+                if (audio) audio.currentTime = 0;
+                progressSlider.value = 0;
+                currentTimeSpan.innerText = "0:00";
+            }
+        }
+    };
+    
+    // Cập nhật giao diện thông tin bài hát + playlist active
+    const updateTrackInfoUI = () => {
+        const currentFile = trackFiles[currentTrackIndex];
+        const display = getDisplayName(currentFile);
+        currentTrackLabel.innerText = display;
+        document.querySelectorAll('.playlist-item').forEach((item, idx) => {
+            if (idx === currentTrackIndex) {
+                item.classList.add('active-track');
+                let badgeSpan = item.querySelector('.now-playing-badge');
+                if (!badgeSpan) {
+                    badgeSpan = document.createElement('span');
+                    badgeSpan.className = 'now-playing-badge';
+                    badgeSpan.innerText = '🔊 ';
+                    item.appendChild(badgeSpan);
+                } else {
+                    badgeSpan.innerText = '🔊 ';
+                    badgeSpan.style.display = 'inline-block';
+                }
+            } else {
+                item.classList.remove('active-track');
+                const oldBadge = item.querySelector('.now-playing-badge');
+                if (oldBadge) oldBadge.remove();
+            }
+        });
+        // cập nhật nút play/pause icon
+        if (isPlaying) {
+            playPauseBtn.innerHTML = '⏸';
+            playPauseBtn.style.background = "#c28a4b";
+        } else {
+            playPauseBtn.innerHTML = '▶';
+            playPauseBtn.style.background = "#b97f44";
+        }
+    };
+    
+    // Load track
+    const loadTrack = (index, autoPlay = false) => {
+        if (index < 0) index = 0;
+        if (index >= totalTracks) index = totalTracks - 1;
+        currentTrackIndex = index;
+        const trackSrc = trackFiles[currentTrackIndex];
+        
+        const wasPlaying = isPlaying;
+        if (audio) {
+            audio.pause();
+            audio.removeEventListener('timeupdate', updateProgress);
+            audio.removeEventListener('loadedmetadata', onLoadedMetadata);
+            audio.removeEventListener('ended', onTrackEnd);
+            audio.removeEventListener('error', handleAudioError);
+        }
+        
+        audio = new Audio();
+        audio.src = trackSrc;
+        audio.preload = 'metadata';
+        
+        audio.addEventListener('timeupdate', updateProgress);
+        audio.addEventListener('loadedmetadata', onLoadedMetadata);
+        audio.addEventListener('ended', onTrackEnd);
+        audio.addEventListener('error', handleAudioError);
+        
+        progressSlider.value = 0;
+        currentTimeSpan.innerText = "0:00";
+        durationTimeSpan.innerText = "0:00";
+        
+        updateTrackInfoUI();
+        
+        if (autoPlay) {
+            const playPromise = audio.play();
+            if (playPromise !== undefined) {
+                playPromise.then(() => {
+                    isPlaying = true;
+                    updateTrackInfoUI();
+                    let modeText = "";
+                    if (repeatMode === 1) modeText = " 🔂 (lặp bài)";
+                    else if (repeatMode === 2) modeText = " 🔁 (lặp danh sách)";
+                    updateStatusMessage(`: ${getDisplayName(trackSrc)}${modeText}`);
+                }).catch(err => {
+                    console.warn("Auto play bị chặn:", err);
+                    isPlaying = false;
+                    updateTrackInfoUI();
+                    updateStatusMessage(`⚠️ Không thể tự động phát. Vui lòng bấm play. (${err.message || 'lỗi tải file'})`);
+                });
+            } else {
+                isPlaying = true;
+                updateTrackInfoUI();
+                updateStatusMessage(`: ${getDisplayName(trackSrc)}`);
+            }
+        } else {
+            isPlaying = false;
+            updateTrackInfoUI();
+            updateStatusMessage(`Đã tải: ${getDisplayName(trackSrc)}`);
+        }
+    };
+    
+    const onLoadedMetadata = () => {
+        if (audio && !isNaN(audio.duration)) {
+            durationTimeSpan.innerText = formatTime(audio.duration);
+            progressSlider.max = Math.floor(audio.duration);
+        } else {
+            durationTimeSpan.innerText = "0:00";
+        }
+    };
+    
+    const updateProgress = () => {
+        if (audio && !isSeeking && audio.duration && !isNaN(audio.duration)) {
+            const current = audio.currentTime;
+            progressSlider.value = current;
+            currentTimeSpan.innerText = formatTime(current);
+            if (progressSlider.max !== Math.floor(audio.duration)) {
+                progressSlider.max = Math.floor(audio.duration);
+                durationTimeSpan.innerText = formatTime(audio.duration);
+            }
+        }
+    };
+    
+    const handleAudioError = (e) => {
+        console.error("Lỗi phát file:", audio.src, e);
+        let errorMsg = "Không thể tải file. Kiểm tra đường dẫn file .m4a";
+        if (audio.error) {
+            switch(audio.error.code) {
+                case MediaError.MEDIA_ERR_NETWORK: errorMsg = "Lỗi mạng khi tải file."; break;
+                case MediaError.MEDIA_ERR_DECODE: errorMsg = "File âm thanh bị lỗi hoặc không hỗ trợ."; break;
+                case MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED: errorMsg = "Định dạng file không hỗ trợ hoặc không tìm thấy."; break;
+                default: errorMsg = "Lỗi không xác định.";
+            }
+        }
+        updateStatusMessage(`❌ Lỗi: ${errorMsg} (${getDisplayName(trackFiles[currentTrackIndex])})`);
+        isPlaying = false;
+        updateTrackInfoUI();
+    };
+    
+    const updateStatusMessage = (msg) => {
+        statusMsgDiv.innerText = msg;
+        setTimeout(() => {
+            if (statusMsgDiv.innerText === msg) {
+                if (!isPlaying) statusMsgDiv.innerText = "⏸ Dừng • Chọn bài để phát";
+                else {
+                    let modeHint = "";
+                    if (repeatMode === 1) modeHint = " 🔂 lặp 1 bài";
+                    else if (repeatMode === 2) modeHint = " 🔁 lặp tất cả";
+                    statusMsgDiv.innerText = `🎵  Tam Quốc${modeHint}`;
+                }
+            }
+        }, 2800);
+    };
+    
+    // Phát / tạm dừng
+    const togglePlayPause = () => {
+        if (!audio || !audio.src) {
+            loadTrack(currentTrackIndex, true);
+            return;
+        }
+        if (isPlaying) {
+            audio.pause();
+            isPlaying = false;
+            updateTrackInfoUI();
+            updateStatusMessage("⏸ Đã tạm dừng");
+        } else {
+            const playPromise = audio.play();
+            if (playPromise !== undefined) {
+                playPromise.then(() => {
+                    isPlaying = true;
+                    updateTrackInfoUI();
+                    let modeText = "";
+                    if (repeatMode === 1) modeText = " 🔂 (lặp bài)";
+                    else if (repeatMode === 2) modeText = " 🔁 (lặp danh sách)";
+                    updateStatusMessage(`: ${getDisplayName(trackFiles[currentTrackIndex])}${modeText}`);
+                }).catch(err => {
+                    console.warn("Play bị chặn:", err);
+                    updateStatusMessage(`⚠️ Không thể phát: ${err.message}. Kiểm tra file.`);
+                    isPlaying = false;
+                    updateTrackInfoUI();
+                });
+            } else {
+                isPlaying = true;
+                updateTrackInfoUI();
+            }
+        }
+    };
+    
+    const prevTrack = (autoPlayAfter = true) => {
+        let newIndex = currentTrackIndex - 1;
+        if (newIndex < 0) newIndex = totalTracks - 1;
+        currentTrackIndex = newIndex;
+        loadTrack(currentTrackIndex, autoPlayAfter);
+    };
+    
+    const nextTrack = (autoPlayAfter = true) => {
+        let newIndex = currentTrackIndex + 1;
+        if (newIndex >= totalTracks) {
+            if (repeatMode === 2) {
+                newIndex = 0;  // lặp tất cả: quay về đầu
+            } else {
+                newIndex = totalTracks - 1;  // không lặp all thì giữ cuối và không auto chuyển vòng, nhưng next từ cuối thì có thể dừng? Xử lý: nếu hết danh sách và repeat all off thì giữ nguyên cuối, không phát? 
+                // Theo logic chuẩn, khi hết danh sách và repeat all không bật, next sẽ không chuyển về đầu, nhưng ở đây để trải nghiệm mượt, nếu không lặp và đang ở cuối thì next sẽ vẫn ở cuối và không phát (hoặc phát lại bài cuối). Nhưng để chuẩn: nếu không repeat all và ở cuối, next không chuyển bài và dừng phát.
+                if (currentTrackIndex === totalTracks - 1 && !autoPlayAfter) {
+                    updateStatusMessage("Đã là bài cuối cùng. Bật lặp tất cả để tiếp tục danh sách.");
+                    return;
+                } else if (currentTrackIndex === totalTracks - 1 && autoPlayAfter) {
+                    // Không nên chuyển vòng, vẫn giữ nguyên bài cuối nhưng không phát mới?
+                    updateStatusMessage("Đã hết danh sách, bật chế độ lặp tất cả để nghe lại từ đầu.");
+                    return;
+                }
+            }
+        }
+        if (newIndex >= totalTracks) newIndex = totalTracks - 1;
+        if (newIndex < 0) newIndex = 0;
+        if (newIndex === currentTrackIndex && newIndex === totalTracks - 1 && repeatMode !== 2) {
+            updateStatusMessage("Đã là bài cuối cùng.");
+            return;
+        }
+        currentTrackIndex = newIndex;
+        loadTrack(currentTrackIndex, autoPlayAfter);
+    };
+    
+    const seekTo = (value) => {
+        if (audio && audio.duration && !isNaN(audio.duration)) {
+            audio.currentTime = value;
+            currentTimeSpan.innerText = formatTime(value);
+        }
+    };
+    
+    // Xử lý repeat button: luân phiên 0 -> 1 -> 2 -> 0
+    const cycleRepeatMode = () => {
+        repeatMode = (repeatMode + 1) % 3;
+        updateRepeatUI();
+        let modeMsg = "";
+        if (repeatMode === 0) modeMsg = "Đã tắt lặp. Phát bình thường.";
+        else if (repeatMode === 1) modeMsg = "Đã bật LẶP MỘT BÀI. Bài hiện tại sẽ phát lại.";
+        else modeMsg = "Đã bật LẶP TẤT CẢ. Danh sách sẽ phát vòng tròn.";
+        updateStatusMessage(modeMsg);
+        // Nếu đang ở cuối danh sách và repeat all vừa bật, không ảnh hưởng đến phát hiện tại
+    };
+    
+    // Sự kiện thanh trượt
+    progressSlider.addEventListener('mousedown', () => { isSeeking = true; });
+    progressSlider.addEventListener('mouseup', () => { 
+        isSeeking = false; 
+        if (audio) seekTo(parseFloat(progressSlider.value));
+    });
+    progressSlider.addEventListener('input', (e) => {
+        if (audio) {
+            const val = parseFloat(e.target.value);
+            currentTimeSpan.innerText = formatTime(val);
+        }
+    });
+    progressSlider.addEventListener('change', (e) => {
+        if (audio) {
+            seekTo(parseFloat(e.target.value));
+        }
+    });
+    progressSlider.addEventListener('touchstart', () => { isSeeking = true; });
+    progressSlider.addEventListener('touchend', () => { 
+        isSeeking = false;
+        if (audio) seekTo(parseFloat(progressSlider.value));
+    });
+    
+    // Build playlist UI
+    const buildPlaylist = () => {
+        playlistContainer.innerHTML = '';
+        trackFiles.forEach((file, idx) => {
+            const displayName = getDisplayName(file);
+            const itemDiv = document.createElement('div');
+            itemDiv.className = 'playlist-item';
+            if (idx === currentTrackIndex) itemDiv.classList.add('active-track');
+            
+            const leftSpan = document.createElement('div');
+            leftSpan.style.display = 'flex';
+            leftSpan.style.alignItems = 'center';
+            leftSpan.style.flex = '1';
+            leftSpan.style.overflow = 'hidden';
+            
+            const numberSpan = document.createElement('span');
+            numberSpan.className = 'track-number';
+            numberSpan.innerText = idx+1;
+            
+            const nameSpan = document.createElement('span');
+            nameSpan.className = 'track-name';
+            nameSpan.innerText = displayName;
+            
+            leftSpan.appendChild(numberSpan);
+            leftSpan.appendChild(nameSpan);
+            itemDiv.appendChild(leftSpan);
+            
+            if (idx === currentTrackIndex && isPlaying) {
+                const badge = document.createElement('span');
+                badge.className = 'now-playing-badge';
+                badge.innerText = '🔊 ';
+                itemDiv.appendChild(badge);
+            }
+            
+            itemDiv.addEventListener('click', (e) => {
+                e.stopPropagation();
+                if (currentTrackIndex === idx) {
+                    if (isPlaying) togglePlayPause();
+                    else togglePlayPause();
+                } else {
+                    currentTrackIndex = idx;
+                    loadTrack(currentTrackIndex, true);
+                }
+            });
+            playlistContainer.appendChild(itemDiv);
+        });
+    };
+    
+    // Khởi tạo
+    const initPlayer = () => {
+        buildPlaylist();
+        currentTrackIndex = 0;
+        audio = new Audio();
+        audio.preload = 'metadata';
+        loadTrack(0, false);
+        
+        playPauseBtn.addEventListener('click', togglePlayPause);
+        prevBtn.addEventListener('click', () => prevTrack(true));
+        nextBtn.addEventListener('click', () => nextTrack(true));
+        repeatBtn.addEventListener('click', cycleRepeatMode);
+        
+        updateRepeatUI();
+        updateStatusMessage("📀 Sẵn sàng. Nhấn play hoặc chọn chương. Đã thêm chức năng lặp (🔁).");
+    };
+    
+    initPlayer();
+</script>
+</body>
+</html>
