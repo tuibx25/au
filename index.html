@@ -2,192 +2,181 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Tam Quốc Audio Player - Danh sách phát</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <title>Tam Quốc Audio - Gọn gàng trên di động</title>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            user-select: none; /* tránh bôi nhỡ trên nút, vẫn cho phép chọn text trong playlist nếu cần */
         }
 
         body {
-            background: linear-gradient(145deg, #8B5A2B 0%, #5a3a1a 100%);
+            background: linear-gradient(145deg, #7a4a1e 0%, #4a2a0e 100%);
             min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            font-family: 'Segoe UI', 'Roboto', 'Noto Sans', system-ui, -apple-system, 'Helvetica Neue', sans-serif;
-            padding: 20px;
+            font-family: system-ui, -apple-system, 'Segoe UI', 'Roboto', 'Helvetica Neue', sans-serif;
+            padding: 12px;
         }
 
-        /* Container chính - giao diện gọn gàng, nhiều không gian danh sách */
+        /* Container chính - bo góc mềm, không gian thoáng */
         .player-container {
-            max-width: 1100px;
+            max-width: 1000px;
             width: 100%;
-            background: #FFFFFF;
-            border-radius: 42px;
-            box-shadow: 0 25px 45px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(139, 69, 19, 0.2);
+            background: #ffffff;
+            border-radius: 36px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25), 0 2px 6px rgba(0, 0, 0, 0.1);
             overflow: hidden;
-            transition: all 0.2s;
+            transition: all 0.2s ease;
         }
 
-        /* Header nhẹ với màu nâu đặc trưng */
+        /* Header nhẹ nhàng */
         .player-header {
-            background: #F5F5DC;
-            padding: 18px 28px;
-            border-bottom: 2px solid #F5DEB3;
+            background: #FEF7E6;
+            padding: 14px 20px;
+            border-bottom: 1px solid #f0e2c5;
         }
 
         .player-header h1 {
-            font-size: 1.7rem;
+            font-size: 1.35rem;
             font-weight: 600;
-            color: #8B4513;
-            letter-spacing: -0.3px;
+            color: #7b3f00;
             display: flex;
             align-items: center;
-            gap: 12px;
-            flex-wrap: wrap;
             justify-content: space-between;
+            gap: 10px;
+            flex-wrap: wrap;
         }
 
         .header-badge {
-            background: #8B5A2B;
-            padding: 5px 14px;
-            border-radius: 60px;
-            font-size: 0.85rem;
-            font-weight: 400;
-            color: #F5F5DC;
+            background: #c28a4e;
+            padding: 4px 12px;
+            border-radius: 40px;
+            font-size: 0.7rem;
+            font-weight: 500;
+            color: #fff7e8;
+            white-space: nowrap;
         }
 
-        /* Khu vực điều khiển chính + thông tin */
+        /* Khu vực đang phát - tối giản */
         .now-playing-area {
-            background: #F5F5F5;
-            padding: 20px 28px;
-            border-bottom: 1px solid #D3D3D3;
+            background: #fafaf5;
+            padding: 16px 20px;
+            border-bottom: 1px solid #eee5d8;
         }
 
         .track-info {
-            margin-bottom: 20px;
+            margin-bottom: 14px;
         }
 
         .track-title {
-            font-size: 1.6rem;
+            font-size: 1.25rem;
             font-weight: 700;
-            color: #8B4513;
-            background: #F5DEB3;
+            color: #5a2e0e;
+            background: #fff2df;
             display: inline-block;
-            padding: 6px 18px;
-            border-radius: 40px;
-            letter-spacing: 1px;
-            box-shadow: inset 0 1px 2px rgba(0,0,0,0.02), 0 2px 4px rgba(0,0,0,0.05);
+            padding: 5px 16px;
+            border-radius: 32px;
+            letter-spacing: -0.2px;
+            max-width: 100%;
+            word-break: break-word;
+            box-shadow: inset 0 0 0 1px #ffe0b5, 0 1px 3px rgba(0,0,0,0.02);
         }
 
-        .track-sub {
-            font-size: 0.9rem;
-            color: #5a3a22;
-            margin-top: 8px;
-            margin-left: 8px;
-            font-weight: 500;
-        }
-
-        /* controls chính: play, prev, next, loop mode, volume */
+        /* Controls: gọn trên mobile, linh hoạt */
         .audio-controls {
             display: flex;
             flex-wrap: wrap;
             align-items: center;
             justify-content: space-between;
-            gap: 15px;
-            margin: 15px 0 10px;
+            gap: 12px;
+            margin: 12px 0 8px;
         }
 
         .playback-buttons {
             display: flex;
-            gap: 18px;
-            background: #FFFFFF;
-            padding: 6px 20px;
+            gap: 12px;
+            background: #ffffff;
+            padding: 4px 12px;
             border-radius: 60px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
         }
 
         .ctrl-btn {
             background: transparent;
             border: none;
-            font-size: 2rem;
+            font-size: 1.8rem;
             cursor: pointer;
-            color: #8B5A2B;
+            color: #8b5a2b;
             transition: 0.2s;
-            width: 48px;
-            height: 48px;
+            width: 44px;
+            height: 44px;
             border-radius: 50%;
             display: inline-flex;
             align-items: center;
             justify-content: center;
-        }
-
-        .ctrl-btn:hover {
-            background: #F5DEB3;
-            color: #8B4513;
-            transform: scale(1.02);
+            touch-action: manipulation;
         }
 
         .ctrl-btn:active {
-            transform: scale(0.96);
+            background: #f0e0c0;
+            transform: scale(0.94);
         }
 
+        /* Group loop và volume gọn hơn */
         .loop-group {
             display: flex;
-            gap: 12px;
-            background: #FFFFFF;
-            padding: 5px 20px;
+            gap: 8px;
+            background: #ffffff;
+            padding: 4px 12px;
             border-radius: 60px;
             align-items: center;
         }
 
         .loop-btn {
-            background: #F5F5F5;
-            border: 1px solid #D3D3D3;
-            padding: 8px 18px;
+            background: #f4f0ea;
+            border: none;
+            padding: 6px 14px;
             border-radius: 40px;
             font-weight: 600;
-            font-size: 0.85rem;
+            font-size: 0.75rem;
             color: #5a3e24;
             cursor: pointer;
             transition: 0.2s;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 5px;
+            touch-action: manipulation;
         }
 
         .loop-btn.active {
-            background: #0066CC;
-            border-color: #004488;
+            background: #0066cc;
             color: white;
-            box-shadow: 0 2px 8px rgba(0,102,204,0.3);
+            box-shadow: 0 2px 6px rgba(0, 102, 204, 0.3);
         }
 
         .volume-wrap {
             display: flex;
             align-items: center;
-            gap: 12px;
-            background: #FFFFFF;
-            padding: 5px 20px;
+            gap: 10px;
+            background: #ffffff;
+            padding: 4px 14px;
             border-radius: 60px;
         }
 
         .volume-icon {
-            font-size: 1.4rem;
-            color: #8B5A2B;
+            font-size: 1.2rem;
+            color: #8b5a2b;
         }
 
         input[type="range"] {
-            width: 120px;
+            width: 100px;
             height: 4px;
             -webkit-appearance: none;
-            background: #D3D3D3;
-            border-radius: 5px;
-            outline: none;
+            background: #ddd2c0;
+            border-radius: 4px;
         }
 
         input[type="range"]:focus {
@@ -199,19 +188,18 @@
             width: 14px;
             height: 14px;
             border-radius: 50%;
-            background: #8B5A2B;
+            background: #b46f30;
             cursor: pointer;
-            border: 2px solid #F5F5DC;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+            border: 2px solid #fff0dd;
         }
 
-        /* progress bar */
+        /* Progress bar */
         .progress-section {
-            margin: 15px 0 8px;
+            margin: 12px 0 4px;
         }
 
         .progress-bar-bg {
-            background: #D3D3D3;
+            background: #e0cfba;
             border-radius: 20px;
             height: 6px;
             width: 100%;
@@ -220,133 +208,191 @@
         }
 
         .progress-fill {
-            background: #0066CC;
+            background: #0066cc;
             width: 0%;
             height: 6px;
             border-radius: 20px;
-            transition: width 0.1s linear;
+            transition: width 0.05s linear;
         }
 
         .time-info {
             display: flex;
             justify-content: space-between;
-            margin-top: 8px;
-            font-size: 0.75rem;
-            color: #8B4513;
+            margin-top: 6px;
+            font-size: 0.7rem;
+            color: #a2642c;
             font-weight: 500;
         }
 
-        /* danh sách phát - ưu tiên không gian rộng, gọn gàng cuộn */
+        /* PLAYLIST - thiết kế gọn, dễ chạm */
         .playlist-section {
-            background: #FFFFFF;
-            padding: 16px 20px 24px 20px;
+            background: #ffffff;
+            padding: 12px 16px 20px 16px;
         }
 
         .playlist-title {
-            font-size: 1.2rem;
+            font-size: 1rem;
             font-weight: 600;
-            color: #8B4513;
-            margin-bottom: 15px;
+            color: #7b3f00;
+            margin-bottom: 10px;
             padding-left: 8px;
-            border-left: 5px solid #8B5A2B;
+            border-left: 4px solid #c28a4e;
         }
 
         .playlist-scroll {
             max-height: 380px;
             overflow-y: auto;
-            border-radius: 24px;
-            background: #F5F5F5;
-            padding: 8px 6px;
-            box-shadow: inset 0 0 0 1px #F5DEB3, 0 4px 12px rgba(0,0,0,0.05);
+            border-radius: 28px;
+            background: #fef9f0;
+            padding: 6px 4px;
+            scrollbar-width: thin;
         }
 
         .playlist-item {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 12px 16px;
-            margin: 4px 0;
-            background: #FFFFFF;
-            border-radius: 40px;
+            padding: 10px 14px;
+            margin: 5px 4px;
+            background: #ffffff;
+            border-radius: 60px;
             cursor: pointer;
             transition: all 0.2s;
-            border: 1px solid #F5DEB3;
+            border: 1px solid #f1e2cf;
+            touch-action: manipulation;
         }
 
-        .playlist-item:hover {
-            background: #F5DEB3;
-            transform: translateX(4px);
+        .playlist-item:active {
+            background: #f7efdf;
+            transform: scale(0.99);
         }
 
         .playlist-item.active-track {
-            background: #0066CC;
-            border-color: #004488;
+            background: #0066cc;
+            border-color: #004c99;
             color: white;
-            box-shadow: 0 4px 10px rgba(0,102,204,0.2);
-        }
-
-        .playlist-item.active-track .track-name {
-            color: white;
-            font-weight: 600;
+            box-shadow: 0 3px 8px rgba(0, 102, 204, 0.2);
         }
 
         .track-name {
-            font-size: 0.95rem;
+            font-size: 0.88rem;
             font-weight: 500;
-            color: #2c221b;
-            letter-spacing: 0.3px;
+            color: #3e2a1b;
+            letter-spacing: -0.2px;
+            /* Ẩn phần mở rộng .m4a bằng js, nhưng css cũng hỗ trợ fallback */
+            word-break: break-word;
+            flex: 1;
+        }
+
+        .active-track .track-name {
+            color: white;
+            font-weight: 500;
         }
 
         .track-duration {
-            font-size: 0.7rem;
-            background: #F5F5DC;
-            padding: 2px 10px;
+            font-size: 0.65rem;
+            background: #efe2d0;
+            padding: 2px 8px;
             border-radius: 30px;
-            color: #8B4513;
+            color: #7b4a1e;
+            margin-left: 10px;
+            white-space: nowrap;
         }
 
         .active-track .track-duration {
-            background: #FFFFFFCC;
-            color: #004488;
+            background: rgba(255, 255, 255, 0.25);
+            color: white;
         }
 
-        /* custom scrollbar */
+        /* Scrollbar nhẹ */
         .playlist-scroll::-webkit-scrollbar {
-            width: 6px;
+            width: 4px;
         }
         .playlist-scroll::-webkit-scrollbar-track {
-            background: #F5DEB3;
+            background: #f0e3d4;
             border-radius: 10px;
         }
         .playlist-scroll::-webkit-scrollbar-thumb {
-            background: #8B5A2B;
+            background: #c28a4e;
             border-radius: 10px;
         }
 
         footer {
-            background: #F5F5DC;
-            padding: 8px 24px;
-            font-size: 0.7rem;
-            color: #8B4513;
+            background: #FEF7E6;
+            padding: 8px 16px;
+            font-size: 0.6rem;
+            color: #aa7942;
             text-align: center;
-            border-top: 1px solid #F5DEB3;
+            border-top: 1px solid #f0e2cd;
         }
 
-        @media (max-width: 700px) {
-            .audio-controls {
-                flex-direction: column;
-                align-items: stretch;
+        /* Responsive mobile tinh gọn */
+        @media (max-width: 640px) {
+            body {
+                padding: 8px;
             }
-            .playback-buttons, .loop-group, .volume-wrap {
-                justify-content: center;
+            .player-container {
+                border-radius: 28px;
+            }
+            .player-header h1 {
+                font-size: 1.15rem;
             }
             .track-title {
-                font-size: 1.2rem;
+                font-size: 1rem;
+                padding: 4px 14px;
+            }
+            .audio-controls {
+                gap: 8px;
+                justify-content: center;
+            }
+            .playback-buttons {
+                gap: 8px;
+                padding: 2px 10px;
             }
             .ctrl-btn {
-                width: 44px;
-                height: 44px;
-                font-size: 1.7rem;
+                width: 40px;
+                height: 40px;
+                font-size: 1.6rem;
+            }
+            .loop-btn {
+                padding: 4px 10px;
+                font-size: 0.7rem;
+            }
+            .volume-wrap {
+                padding: 2px 12px;
+                gap: 6px;
+            }
+            input[type="range"] {
+                width: 80px;
+            }
+            .playlist-item {
+                padding: 8px 12px;
+            }
+            .track-name {
+                font-size: 0.82rem;
+            }
+            .playlist-scroll {
+                max-height: 340px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .loop-group {
+                order: 2;
+                width: auto;
+            }
+            .volume-wrap {
+                order: 3;
+            }
+            .playback-buttons {
+                order: 1;
+            }
+            .audio-controls {
+                flex-wrap: wrap;
+                justify-content: space-evenly;
+            }
+            .track-title {
+                font-size: 0.9rem;
             }
         }
     </style>
@@ -357,31 +403,31 @@
     <div class="player-header">
         <h1>
             🎧 Tam Quốc Diễn Nghĩa
-            <span class="header-badge">Audio Series • 120 hồi</span>
+            <span class="header-badge">120 hồi âm thanh</span>
         </h1>
     </div>
 
     <div class="now-playing-area">
         <div class="track-info">
-            <div class="track-title" id="currentTrackName">Tam Quoc 001.m4a</div>
+            <div class="track-title" id="currentTrackName">Tam Quốc 001</div>
         </div>
 
         <div class="audio-controls">
             <div class="playback-buttons">
-                <button class="ctrl-btn" id="prevBtn" title="Bài trước">⏮</button>
-                <button class="ctrl-btn" id="playPauseBtn" title="Phát / Tạm dừng">▶</button>
-                <button class="ctrl-btn" id="nextBtn" title="Bài tiếp">⏭</button>
+                <button class="ctrl-btn" id="prevBtn" aria-label="Bài trước">⏮</button>
+                <button class="ctrl-btn" id="playPauseBtn" aria-label="Phát / Dừng">▶</button>
+                <button class="ctrl-btn" id="nextBtn" aria-label="Bài tiếp">⏭</button>
             </div>
 
             <div class="loop-group">
-                <button id="loopOneBtn" class="loop-btn" title="Lặp lại 1 bài">🔂 Lặp 1</button>
-                <button id="loopAllBtn" class="loop-btn active" title="Lặp toàn danh sách">🔁 Lặp tất cả</button>
+                <button id="loopOneBtn" class="loop-btn" aria-label="Lặp một bài">🔂 1</button>
+                <button id="loopAllBtn" class="loop-btn active" aria-label="Lặp tất cả">🔁 Tất cả</button>
             </div>
 
             <div class="volume-wrap">
                 <span class="volume-icon">🔊</span>
                 <input type="range" id="volumeSlider" min="0" max="1" step="0.01" value="0.75">
-                <span id="volumePercent" style="min-width: 40px; font-size: 0.75rem; color:#8B4513;">75%</span>
+                <span id="volumePercent" style="min-width: 38px; font-size: 0.7rem; color:#8b5a2b;">75%</span>
             </div>
         </div>
 
@@ -398,15 +444,15 @@
 
     <div class="playlist-section">
         <div class="playlist-scroll" id="playlistContainer">
-            <!-- danh sách sẽ được sinh tự động bằng javascript -->
+            <!-- Danh sách phát tự động tạo, tên file sẽ được làm sạch đuôi .m4a -->
         </div>
     </div>
-    <footer>🎵 Tam Quốc Audio Player | Lặp 1 bài / Lặp toàn bộ | Điều chỉnh âm lượng</footer>
+    <footer>🎵 Tam Quốc | Nhấn vào bài để nghe | Lặp 1 / Tất cả</footer>
 </div>
 
 <script>
-    // ======================= TẠO DANH SÁCH TỪ FILE LIST =======================
-    const fileNames = [
+    // ======================= DANH SÁCH FILE GỐC (CÓ ĐUÔI .M4A) =======================
+    const fileNamesRaw = [
         "Tam Quoc 001.m4a", "Tam Quoc 002.m4a", "Tam Quoc 003.m4a", "Tam Quoc 004.m4a", "Tam Quoc 005.m4a",
         "Tam Quoc 006.m4a", "Tam Quoc 007.m4a", "Tam Quoc 008.m4a", "Tam Quoc 009.m4a", "Tam Quoc 010.m4a",
         "Tam Quoc 011.m4a", "Tam Quoc 012.m4a", "Tam Quoc 013.m4a", "Tam Quoc 014.m4a", "Tam Quoc 015.m4a",
@@ -433,13 +479,21 @@
         "Tam Quoc 116.m4a", "Tam Quoc 117.m4a", "Tam Quoc 118.m4a", "Tam Quoc 119.m4a", "Tam Quoc 120 end.m4a"
     ];
 
-    // Giả lập đường dẫn audio: bạn có thể thay baseUrl bằng đường dẫn thực tế nếu file nằm ở thư mục.
-    // Trong môi trường local, nếu file cùng thư mục với html thì chỉ cần tên file.
-    // Nếu các file nằm ở đường dẫn khác, hãy sửa biến BASE_URL (ví dụ: "./audio/")
-    const BASE_URL = "";  // để trống nghĩa là cùng thư mục với file HTML. Nếu cần thay bằng "./audio/" hoặc đường dẫn tuyệt đối.
-    
-    const playlist = fileNames.map(name => ({
-        name: name,
+    // Hàm làm sạch tên hiển thị: loại bỏ đuôi .m4a, đồng thời xử lý "120 end" -> "120" cho đẹp
+    function cleanDisplayName(rawName) {
+        let nameWithoutExt = rawName.replace(/\.m4a$/i, '');
+        // Nếu có " end" thì xóa (cho file cuối)
+        nameWithoutExt = nameWithoutExt.replace(/\s+end$/i, '');
+        return nameWithoutExt;
+    }
+
+    // Đường dẫn audio: cùng thư mục với file HTML (có thể chỉnh BASE_URL nếu cần)
+    const BASE_URL = "";  // để trống => lấy từ cùng thư mục
+
+    // Tạo playlist với tên hiển thị sạch, giữ nguyên URL gốc (có đuôi .m4a)
+    const playlist = fileNamesRaw.map(name => ({
+        rawName: name,
+        displayName: cleanDisplayName(name),
         url: BASE_URL + encodeURI(name)
     }));
 
@@ -448,8 +502,7 @@
     let currentTrackIndex = 0;
     let isPlaying = false;
     let loopMode = "all"; // "all" hoặc "one"
-    
-    // Các nút & element
+
     const playPauseBtn = document.getElementById("playPauseBtn");
     const prevBtn = document.getElementById("prevBtn");
     const nextBtn = document.getElementById("nextBtn");
@@ -464,28 +517,27 @@
     const currentTrackNameSpan = document.getElementById("currentTrackName");
     const playlistContainer = document.getElementById("playlistContainer");
 
-    // Helper format time (seconds -> mm:ss)
+    // Helper format time
     function formatTime(seconds) {
-        if (isNaN(seconds)) return "0:00";
+        if (isNaN(seconds) || seconds === Infinity) return "0:00";
         const mins = Math.floor(seconds / 60);
         const secs = Math.floor(seconds % 60);
         return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
     }
 
-    // Cập nhật giao diện active trong playlist
+    // Cập nhật active trong playlist và tên hiển thị
     function updatePlaylistActive() {
         const items = document.querySelectorAll(".playlist-item");
         items.forEach((item, idx) => {
             if (idx === currentTrackIndex) {
                 item.classList.add("active-track");
-                // scroll into view nếu cần
                 item.scrollIntoView({ behavior: "smooth", block: "nearest" });
             } else {
                 item.classList.remove("active-track");
             }
         });
-        // Cập nhật tên bài đang phát trên header
-        currentTrackNameSpan.textContent = playlist[currentTrackIndex].name;
+        // Hiển thị tên bài không có đuôi .m4a
+        currentTrackNameSpan.textContent = playlist[currentTrackIndex].displayName;
     }
 
     // Tải bài hát theo chỉ số
@@ -497,25 +549,28 @@
         audio.src = track.url;
         audio.load();
         updatePlaylistActive();
-        // reset progress
+        // Reset progress
         progressFill.style.width = "0%";
         currentTimeDisplay.textContent = "0:00";
         durationDisplay.textContent = "0:00";
-        // Nếu đang ở trạng thái playing, tự động phát sau khi load
+        
+        // Nếu đang ở trạng thái playing, tự động phát
         if (isPlaying) {
-            audio.play().catch(e => {
-                console.warn("Auto play bị chặn hoặc lỗi: ", e);
-                isPlaying = false;
-                playPauseBtn.textContent = "▶";
-            });
+            const playPromise = audio.play();
+            if (playPromise !== undefined) {
+                playPromise.catch(e => {
+                    console.warn("Auto play bị chặn: ", e);
+                    isPlaying = false;
+                    playPauseBtn.textContent = "▶";
+                });
+            }
         }
     }
 
-    // Phát hoặc tạm dừng
+    // Phát / tạm dừng
     function togglePlayPause() {
-        if (audio.src === "" || audio.paused) {
-            // nếu chưa có src nào hoặc đang paused
-            if (audio.src === "") {
+        if (!audio.src || audio.paused) {
+            if (!audio.src) {
                 loadTrack(currentTrackIndex);
             }
             audio.play().then(() => {
@@ -533,7 +588,7 @@
         }
     }
 
-    // Next bài
+    // Bài tiếp theo (xử lý loop mode gọn)
     function nextTrack() {
         if (playlist.length === 0) return;
         let newIndex = currentTrackIndex + 1;
@@ -541,14 +596,8 @@
             if (loopMode === "all") {
                 newIndex = 0;
             } else {
-                // nếu lặp 1 bài thì không next mà vẫn giữ bài hiện tại?
-                // Nhưng hành vi next vẫn chuyển bài, nhưng nếu loop 1, không có nghĩa là cấm next, vẫn next bình thường nhưng cuối danh sách thì dừng?
-                // Theo logic người dùng: nút next luôn chuyển bài kế, nếu hết list và loop all thì quay đầu, còn loop one thì dừng ở cuối? 
-                // Để tiện: nếu loop one và hết danh sách thì không làm gì? nhưng người dùng mong muốn next bài nếu có, nếu cuối danh sách và loop one thì dừng lại
-                if (newIndex >= playlist.length) {
-                    // không chuyển, giữ nguyên
-                    return;
-                }
+                // Loop one: không tự chuyển khi hết danh sách, giữ nguyên
+                return;
             }
         }
         if (newIndex < playlist.length) {
@@ -560,7 +609,7 @@
         }
     }
 
-    // Prev bài
+    // Bài trước
     function prevTrack() {
         if (playlist.length === 0) return;
         let newIndex = currentTrackIndex - 1;
@@ -578,7 +627,7 @@
         }
     }
 
-    // Cập nhật loop UI
+    // Cập nhật giao diện nút loop
     function updateLoopUI() {
         if (loopMode === "one") {
             loopOneBtn.classList.add("active");
@@ -589,7 +638,7 @@
         }
     }
 
-    // Xử lý sự kiện khi bài hát kết thúc
+    // Xử lý kết thúc bài
     function onTrackEnded() {
         if (loopMode === "one") {
             // Lặp lại bài hiện tại
@@ -605,8 +654,6 @@
             if (isPlaying) {
                 audio.play().catch(e => console.log("Auto play next", e));
             } else {
-                // Nếu không phát thì vẫn load nhưng không auto play
-                // set isPlaying false nhưng giữ nguyên nút
                 playPauseBtn.textContent = "▶";
                 isPlaying = false;
             }
@@ -621,7 +668,7 @@
         volumePercentSpan.textContent = `${percent}%`;
     }
 
-    // Cập nhật progress bar
+    // Cập nhật progress
     function updateProgress() {
         if (audio.duration && !isNaN(audio.duration)) {
             const percent = (audio.currentTime / audio.duration) * 100;
@@ -635,7 +682,7 @@
         }
     }
 
-    // Seek
+    // Seek khi click vào thanh progress
     function seek(e) {
         const rect = progressBarBg.getBoundingClientRect();
         const clickX = e.clientX - rect.left;
@@ -646,7 +693,7 @@
         }
     }
 
-    // Render danh sách phát
+    // Render danh sách phát với tên đã được làm sạch (không hiện .m4a)
     function renderPlaylist() {
         playlistContainer.innerHTML = "";
         playlist.forEach((track, idx) => {
@@ -656,27 +703,30 @@
             
             const nameSpan = document.createElement("span");
             nameSpan.className = "track-name";
-            nameSpan.textContent = track.name;
+            // HIỂN THỊ TÊN KHÔNG CÓ ĐUÔI .M4A
+            nameSpan.textContent = track.displayName;
             
             const durationSpan = document.createElement("span");
             durationSpan.className = "track-duration";
             durationSpan.textContent = "⏺";
-            // (có thể hiển thị duration sau khi metadata load, nhưng tạm thời để icon)
             
             itemDiv.appendChild(nameSpan);
             itemDiv.appendChild(durationSpan);
-            itemDiv.addEventListener("click", () => {
+            
+            itemDiv.addEventListener("click", (e) => {
+                e.stopPropagation();
                 if (currentTrackIndex !== idx) {
                     currentTrackIndex = idx;
                     loadTrack(currentTrackIndex);
+                    // Tự động phát khi chọn bài mới (tăng trải nghiệm)
                     if (isPlaying) {
                         audio.play().catch(e => console.log(e));
                     } else {
-                        // Nếu chưa phát thì load xong, tự động phát để thuận tiện?
-                        togglePlayPause(); // tự động phát khi click vào bài mới
+                        // Nếu đang dừng, tự động phát khi click vào bài khác (tiện lợi)
+                        togglePlayPause();
                     }
                 } else {
-                    // Cùng bài, nếu đang pause thì play
+                    // Cùng bài, nếu đang pause thì phát
                     if (audio.paused) {
                         togglePlayPause();
                     }
@@ -686,29 +736,37 @@
         });
         updatePlaylistActive();
     }
+    
+    // Cập nhật duration trong playlist sau khi metadata load (cải thiện)
+    function updateDurationForCurrentItem() {
+        if (audio.duration && !isNaN(audio.duration)) {
+            const items = document.querySelectorAll(".playlist-item");
+            if (items[currentTrackIndex]) {
+                const durSpan = items[currentTrackIndex].querySelector(".track-duration");
+                if (durSpan && durSpan.textContent === "⏺") {
+                    durSpan.textContent = formatTime(audio.duration);
+                }
+            }
+        }
+    }
 
-    // Lắng nghe sự kiện audio
+    // Gắn sự kiện audio
     audio.addEventListener("ended", onTrackEnded);
     audio.addEventListener("timeupdate", updateProgress);
     audio.addEventListener("loadedmetadata", () => {
         durationDisplay.textContent = formatTime(audio.duration);
-        // Cập nhật duration trong playlist item (tùy chọn nâng cao)
-        const items = document.querySelectorAll(".playlist-item");
-        if (items[currentTrackIndex] && audio.duration) {
-            const durSpan = items[currentTrackIndex].querySelector(".track-duration");
-            if (durSpan) durSpan.textContent = formatTime(audio.duration);
-        }
+        updateDurationForCurrentItem();
     });
     audio.addEventListener("canplay", () => {
-        if (isPlaying) audio.play().catch(e => console.log("auto"));
+        if (isPlaying) audio.play().catch(e => console.log("auto play fail"));
     });
     
-    // Volume change
+    // Volume control
     volumeSlider.addEventListener("input", (e) => {
         setVolume(parseFloat(e.target.value));
     });
     
-    // Các button listeners
+    // Button listeners
     playPauseBtn.addEventListener("click", togglePlayPause);
     prevBtn.addEventListener("click", prevTrack);
     nextBtn.addEventListener("click", nextTrack);
@@ -733,7 +791,6 @@
         loadTrack(0);
         isPlaying = false;
         playPauseBtn.textContent = "▶";
-        // preload nhẹ
         audio.preload = "metadata";
     }
     
